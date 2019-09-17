@@ -1,5 +1,4 @@
-# snake
-<h1>Snake game project</h1>
+# snake game project
 
 CM385 (Fall 2019)<br />
 Mark Moran<br />
