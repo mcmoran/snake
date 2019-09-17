@@ -10,7 +10,7 @@ function love.load()
                       {x = 1, y = 1} } -- first (head) segment
 
     timer = 0 -- time to movement
-    direction = 'right' -- starting direction
+    directionQueue = {'right'} -- starting direction
 end
 
 function love.update(dt)
@@ -20,25 +20,29 @@ function love.update(dt)
     if timer >= timerLimit then
         timer = timer - timerLimit
 
+        if #directionQueue > 1 then
+            table.remove(directionQueue, 1)
+        end
+
         local nextXPosition = snakeSegments[1].x -- adjusting the next X
         local nextYPosition = snakeSegments[1].y -- adjusting the next Y
 
-        if direction == 'right' then
+        if directionQueue[1] == 'right' then
             nextXPosition = nextXPosition + 1
             if nextXPosition > gridXCount then
                 nextXPosition = 1
             end
-        elseif direction == 'left' then
+        elseif directionQueue[1] == 'left' then
             nextXPosition = nextXPosition - 1
             if nextXPosition < 1 then
                 nextXPosition = gridXCount
             end
-        elseif direction == 'down' then
+        elseif directionQueue[1] == 'down' then
             nextYPosition = nextYPosition + 1
             if nextYPosition > gridYCount then
                 nextYPosition = 1
             end
-        elseif direction == 'up' then
+        elseif directionQueue[1] == 'up' then
             nextYPosition = nextYPosition - 1
             if nextYPosition < 1 then
                 nextYPosition = gridYCount
@@ -66,14 +70,26 @@ function love.draw()
     end
 
     function love.keypressed(key)
-        if key == 'right' then
-            direction = 'right'
-        elseif key == 'left' then
-            direction = 'left'
-        elseif key == 'down' then
-            direction = 'down'
-        elseif key == 'up' then
-            direction = 'up'
+        if key == 'right'
+            and directionQueue[#directionQueue] ~= 'right'
+            and directionQueue[#directionQueue] ~= 'left' then
+                table.insert(directionQueue, 'right')
+
+        elseif key == 'left'
+            and directionQueue[#directionQueue] ~= 'left'
+            and directionQueue[#directionQueue] ~= 'right' then
+                table.insert(directionQueue, 'left')
+
+        elseif key == 'up'
+            and directionQueue[#directionQueue] ~= 'up'
+            and directionQueue[#directionQueue] ~= 'down' then
+                table.insert(directionQueue, 'up')
+
+        elseif key == 'down'
+            and directionQueue[#directionQueue] ~= 'down'
+            and directionQueue[#directionQueue] ~= 'up' then
+                table.insert(directionQueue, 'down')
+
         elseif key == 'escape' then -- end game with escape
             love.event.push("quit")
         end
