@@ -1,7 +1,7 @@
 function love.load()
     gridXCount = 20 -- how many cells across
     gridYCount = 15 -- how many cells up and down
-    cellSize = 30 -- the size of a cell
+    cellSize = 40 -- the size of a cell
 
     love.window.setMode(gridXCount * cellSize, gridYCount * cellSize) -- set the window size
 
@@ -11,6 +11,13 @@ function love.load()
 
     timer = 0 -- time to movement
     directionQueue = {'right'} -- starting direction
+    math.randomseed(os.time())
+
+    function moveFood()
+        foodPosition = {x = math.random(1, gridXCount), y = math.random(1, gridYCount)}
+    end
+
+    moveFood()
 end
 
 function love.update(dt)
@@ -50,9 +57,13 @@ function love.update(dt)
         end
 
         table.insert(snakeSegments, 1, {x = nextXPosition, y = nextYPosition})
-        table.remove(snakeSegments)
-    end
 
+        if snakeSegments[1].x == foodPosition.x and snakeSegments[1].y == foodPosition.y then
+            moveFood()
+        else
+            table.remove(snakeSegments)
+        end
+    end
 end
 
 function love.draw()
@@ -66,33 +77,39 @@ function love.draw()
 
     for segmentIndex, segment in ipairs(snakeSegments) do
         love.graphics.setColor(.6, 1, .32)
-        love.graphics.rectangle('fill', (segment.x - 1) * cellSize, (segment.y - 1) * cellSize, cellSize - 1, cellSize - 1)
+        drawCell(segment.x, segment.y)
     end
 
-    function love.keypressed(key)
-        if key == 'right'
-            and directionQueue[#directionQueue] ~= 'right'
-            and directionQueue[#directionQueue] ~= 'left' then
-                table.insert(directionQueue, 'right')
+    love.graphics.setColor(1, .3, .3)
+    drawCell(foodPosition.x, foodPosition.y)
+end
 
-        elseif key == 'left'
-            and directionQueue[#directionQueue] ~= 'left'
-            and directionQueue[#directionQueue] ~= 'right' then
-                table.insert(directionQueue, 'left')
+function love.keypressed(key)
+    if key == 'right'
+        and directionQueue[#directionQueue] ~= 'right'
+        and directionQueue[#directionQueue] ~= 'left' then
+            table.insert(directionQueue, 'right')
 
-        elseif key == 'up'
-            and directionQueue[#directionQueue] ~= 'up'
-            and directionQueue[#directionQueue] ~= 'down' then
-                table.insert(directionQueue, 'up')
+    elseif key == 'left'
+        and directionQueue[#directionQueue] ~= 'left'
+        and directionQueue[#directionQueue] ~= 'right' then
+            table.insert(directionQueue, 'left')
 
-        elseif key == 'down'
-            and directionQueue[#directionQueue] ~= 'down'
-            and directionQueue[#directionQueue] ~= 'up' then
-                table.insert(directionQueue, 'down')
+    elseif key == 'up'
+        and directionQueue[#directionQueue] ~= 'up'
+        and directionQueue[#directionQueue] ~= 'down' then
+            table.insert(directionQueue, 'up')
 
-        elseif key == 'escape' then -- end game with escape
-            love.event.push("quit")
-        end
+    elseif key == 'down'
+        and directionQueue[#directionQueue] ~= 'down'
+        and directionQueue[#directionQueue] ~= 'up' then
+            table.insert(directionQueue, 'down')
+
+    elseif key == 'escape' then -- end game with escape
+        love.event.push("quit")
     end
+end
 
+function drawCell(x, y)
+    love.graphics.rectangle('fill', (x-1) * cellSize, (y-1) * cellSize, cellSize - 1, cellSize - 1)
 end
