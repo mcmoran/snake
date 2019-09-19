@@ -97,8 +97,8 @@ function love.update(dt)
                 snakeAlive = false
             end
         end
-    elseif timer >=1 then
-        love.load()
+    elseif timer >= 2 then
+      reset()
     end
 end
 
